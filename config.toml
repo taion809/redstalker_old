@@ -1,0 +1,13 @@
+baseurl = "http://redstalker.com"
+languageCode = "en-us"
+title = "Redstalker"
+copyright = "Copyright (c) 2013 - 2014, Redstalker.com; All Rights Reserved."
+disqusShortname = "redstalker"
+MetaDataFormat = "yaml"
+
+[author]
+    name = "Nicholas Johns"
+
+[indexes]
+    tag = "tags"
+    topic = "topics"

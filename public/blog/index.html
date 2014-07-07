@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title> Blogs &middot; Redstalker </title>
+
+  
+  
+  <link rel="stylesheet" href="http://bootswatch.com/readable/bootstrap.min.css">
+  <link href="/css/rsmini.css" rel="stylesheet">
+  <link href="/css/font-awesome.min.css" rel="stylesheet">
+  <link href="/css/highlight/monokai_sublime.css" rel="stylesheet">
+
+  
+  <link href="http://redstalker.com/blog/index.xml" rel="alternate" type="application/rss+xml" title="Redstalker" />
+  <link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic' rel='stylesheet' type='text/css'>
+</head>
+
+    <body>
+        <nav class="navbar navbar-default navbar-default-rs navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://redstalker.com">Redstalker</a>
+        </div>
+
+        <div class="collapse navbar-collapse navbar-right navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/blog">Blog</a>
+                </li>
+                <li class="page-scroll" ><a href="http://redstalker.com#contact">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+        <div class="container">
+            <div class="jumbotron">
+              <div class="row">
+                <div class="col-lg-12 text-center">
+                  <p>My name is Nicholas, I am a software developer.  Reach out to be on <a href ="http://twitter.com/taion809">twitter</a>, <a href="https://github.com/taion809">github</a>, or my <a href="http://redstalker.com#contact">contact form</a>.</p>
+                </div>
+              </div>
+          </div>
+          <div class="content container">
+            <ul class="posts">
+                
+                    <li>
+                    <article class="post">
+                        <header>
+                          <h2><a href="http://redstalker.com/blog/2014/04/19/getting-started-gorilla-mux">Getting Started with Gorilla MUX </a><small> | <span class="post-meta">Sat, Apr 19, 2014</span></small></h2>
+                        </header>
+                        <br />
+                        <p>
+                        This is going to be short and sweet. I have been looking at getting into Go for awhile but lacked incentive. That has, as of a week ago, changed and it&rsquo;s full speed ahead. For this I will be using Gorilla MUX. If you haven&rsquo;t taken a look at the Gorilla toolkit yet I highly recommend it. I really enjoy using it, the use as individual components really resonates with me and my style of coding.
+                        </p>
+                    </article>
+                    </li>
+                
+                    <li>
+                    <article class="post">
+                        <header>
+                          <h2><a href="http://redstalker.com/blog/2013/11/09/docker-containing-madness">Docker: Containing Madness </a><small> | <span class="post-meta">Sat, Nov 9, 2013</span></small></h2>
+                        </header>
+                        <br />
+                        <p>
+                        Recently we had one of our important clients come to us with a node.js application they needed updated. I&rsquo;m not sure of the circumstances surrounding this application but it looked and felt like a ball of spaghetti was thrown in my face. I punted the modifications to another developer in favor of doing the deployment with docker and supervisord. The Problem This node.js application has many assumptions about libraries and file locations that make me cringe, for example it simply won&rsquo;t work unless packages are installed globally and locally.
+                        </p>
+                    </article>
+                    </li>
+                
+                    <li>
+                    <article class="post">
+                        <header>
+                          <h2><a href="http://redstalker.com/blog/2013/09/21/splitting-mysql-dumps">Splitting Mysql Dumps </a><small> | <span class="post-meta">Sat, Sep 21, 2013</span></small></h2>
+                        </header>
+                        <br />
+                        <p>
+                        The version of phpMyAdmin on Rackspace Cloud Sites has a hard limit of 16Mb for imported SQL. I recently had to migrate a database that was over 500Mb. The solution was simple but tedious, export the database schema first and import it in phpMyAdmin then separate the data into many separate files below 16Mb. I came up with a lot of ridiculous solutions using python, perl, combinations of science and voodoo until I realized the solution already existed, Linux.
+                        </p>
+                    </article>
+                    </li>
+                
+                    <li>
+                    <article class="post">
+                        <header>
+                          <h2><a href="http://redstalker.com/blog/2013/08/20/jenkins-ci-deployment-with-bitbucket">Jenkins CI Deployment with Bitbucket </a><small> | <span class="post-meta">Tue, Aug 20, 2013</span></small></h2>
+                        </header>
+                        <br />
+                        <p>
+                        I recently had someone ask me how to get started with Jenkins-CI, git, and ssh. My team is using it now for a CI-git deployment scheme but I was not the one to install or configure it. I didn&rsquo;t really want to let down my friend with an &ldquo;I don&rsquo;t know, google it&rdquo; answer so I spun up a new EC2 instance on Amazon AWS, installed Jenkins, pushed a new private repo to bitbucket, pulled and deployed that push on my Jenkins test server.
+                        </p>
+                    </article>
+                    </li>
+                
+            </ul>
+        </div>
+        <footer class="text-center">
+    <div class="footer-below">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    Copyright &copy; 2014 - Redstalker.com | <a href="/credits">Credits</a> - <a href="https://twitter.com/taion809">Twitter</a> - <a href="https://github.com/taion809">Github</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+    </body>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title> Docker: Containing Madness &middot; Redstalker </title>
+
+  
+  
+  <link rel="stylesheet" href="http://bootswatch.com/readable/bootstrap.min.css">
+  <link href="/css/rsmini.css" rel="stylesheet">
+  <link href="/css/font-awesome.min.css" rel="stylesheet">
+  <link href="/css/highlight/monokai_sublime.css" rel="stylesheet">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="Redstalker" />
+  <link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+
+<nav class="navbar navbar-default navbar-default-rs navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://redstalker.com">Redstalker</a>
+        </div>
+
+        <div class="collapse navbar-collapse navbar-right navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/blog">Blog</a>
+                </li>
+                <li class="page-scroll" ><a href="http://redstalker.com#contact">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="content container">
+    <div class="post">
+      <h1>Docker: Containing Madness<small> | <span class="post-date">Sat, Nov 9, 2013</span></small></h1>
+          
+
+<p>Recently we had one of our important clients come to us with a node.js application they needed updated.  I&rsquo;m not sure of the circumstances surrounding this application but it looked and felt like a ball of spaghetti was thrown in my face.  I punted the modifications to another developer in favor of doing the deployment with docker and supervisord.</p>
+
+<h3 id="toc_0">The Problem</h3>
+
+<p>This node.js application has many assumptions about libraries and file locations that make me cringe, for example it simply won&rsquo;t work unless packages are installed globally <strong>and</strong> locally.</p>
+
+<h3 id="toc_1">The Solution</h3>
+
+<p>Build a docker image containing the application so that it could be deployed without touching anything outside of its container, think like a chroot.</p>
+
+<h3 id="toc_2">Let&rsquo;s Do It!</h3>
+
+<p>The application we will be using can be found in my <a href="https://github.com/taion809/hello-node">github repository</a>.</p>
+
+<p>The following Dockerfile will be used to build our image.  We are using Dockerfiles because it  makes building images simple, versioned, and easily distributable.</p>
+
+<p>Our Dockerfile
+{% gist 7380804 Dockerfile %}</p>
+
+<p>In order to build our image from this Dockerfile we will execute the following command.</p>
+
+<pre><code>sudo docker build -t='johnsn/webapp' . 
+</code></pre>
+
+<p>You should see output like the following</p>
+
+<pre><code># Excerpt
+Step 14 : ENTRYPOINT [&quot;/usr/bin/nodejs&quot;]
+ ---&gt; Running in 0db9a210f33c
+ ---&gt; a82cdefae38d
+Step 15 : CMD [&quot;server.js&quot;]
+ ---&gt; Running in c11ec2908881
+ ---&gt; 439913416e8f
+Successfully built 439913416e8f
+</code></pre>
+
+<p>You can now make the choice to push your image to the docker.io registry, a private registry, or not push at all.  If you chose to push it to a registry you will need to use the docker push command.</p>
+
+<p>From here use docker run to create and start a container so we can verify the build worked.</p>
+
+<pre><code>sudo docker run -d -p 5000:80 johnsn/webapp
+</code></pre>
+
+<p>You should receive output like the following, we used the -p flag to map our host port 5000 to the container port 80 which we exposed in the Dockerfile</p>
+
+<pre><code># Your container ID will be returned
+3f1a9b9ac4e4
+</code></pre>
+
+<p>Verify with curl</p>
+
+<pre><code>curl -v localhost:5000
+</code></pre>
+
+<p>At this point we have a web application running inside a docker container we can serve on port 5000.  But, we have a problem, after a reboot we need to manually run the docker run command to bring up our web app again.  Let&rsquo;s solve that problem with supervisord.</p>
+
+<p>Supervisord is really simple and convenient which is why I am using it over something like daemontools.</p>
+
+<pre><code>[program:webapp]
+command=/usr/bin/docker run -p 5000:80 johnsn/webapp
+autostart=true
+autorestart=true
+</code></pre>
+
+<p>Notice we do not use the -d flag, this is because Supervisord will run our container as a daemon.</p>
+
+<p>Now restart the supervisord service with <code>service</code> or using <code>supervisorctl</code></p>
+
+<pre><code># sudo service supervisor restart does not work :\
+
+sudo service supervisor stop
+sudo service supervisor start
+</code></pre>
+
+<p>Verify</p>
+
+<pre><code>ps aux | grep webapp
+
+# root      8964  0.0  0.7 186948  3600 ?        Sl   03:54   0:00 /usr/bin/docker run -p 5000:80 johnsn/webapp
+</code></pre>
+
+<!-- Logging options here... sometime. -->
+
+<p>Alright, so let&rsquo;s setup nginx properly so we can have webapp.com instead of webapp.com:5000</p>
+
+<pre><code>## HTTP server.
+server {
+    listen 80; # IPv4
+
+    server_name webapp.com;
+
+    ## Access and error logs.
+    access_log /var/log/nginx/webapp.com_access.log;
+    error_log /var/log/nginx/webapp.com_error.log;
+
+    location / {
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Server $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://127.0.0.1:5000;
+    }
+
+} # HTTP server
+</code></pre>
+
+<p>Restart the nginx and verify!</p>
+
+<pre><code>curl -v webapp.com
+</code></pre>
+
+<p>That is it, 30 minutes later we have an immutable linux container for our web app that we can then deploy to a single server or many servers.</p>
+
+<p>Please let me know if you see errors, have corrections, or know a better way.</p>
+
+<h3 id="toc_3">References</h3>
+
+<ul>
+<li><a href="http://docker.io">Docker</a></li>
+<li><a href="http://supervisord.org/">Supervisord</a></li>
+</ul>
+
+    </div>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'redstalker';
+    var disqus_identifier = 'http:\/\/redstalker.com\/blog\/2013\/11\/09\/docker-containing-madness';
+    var disqus_title = 'Docker: Containing Madness';
+    var disqus_url = 'http:\/\/redstalker.com\/blog\/2013\/11\/09\/docker-containing-madness';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+</div>
+
+<footer class="text-center">
+    <div class="footer-below">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    Copyright &copy; 2014 - Redstalker.com | <a href="/credits">Credits</a> - <a href="https://twitter.com/taion809">Twitter</a> - <a href="https://github.com/taion809">Github</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</body>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title> Getting Started with Gorilla MUX &middot; Redstalker </title>
+
+  
+  
+  <link rel="stylesheet" href="http://bootswatch.com/readable/bootstrap.min.css">
+  <link href="/css/rsmini.css" rel="stylesheet">
+  <link href="/css/font-awesome.min.css" rel="stylesheet">
+  <link href="/css/highlight/monokai_sublime.css" rel="stylesheet">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="Redstalker" />
+  <link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+
+<nav class="navbar navbar-default navbar-default-rs navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://redstalker.com">Redstalker</a>
+        </div>
+
+        <div class="collapse navbar-collapse navbar-right navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/blog">Blog</a>
+                </li>
+                <li class="page-scroll" ><a href="http://redstalker.com#contact">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="content container">
+    <div class="post">
+      <h1>Getting Started with Gorilla MUX<small> | <span class="post-date">Sat, Apr 19, 2014</span></small></h1>
+          
+
+<p>This is going to be short and sweet.  I have been looking at getting into Go for awhile but lacked incentive.  That has, as of a week ago, changed and it&rsquo;s full speed ahead.</p>
+
+<p>For this I will be using <a href="http://www.gorillatoolkit.org/pkg/mux">Gorilla MUX</a>.  If you haven&rsquo;t taken a look at the Gorilla toolkit yet I highly recommend it.  I really enjoy using it, the use as individual components really resonates with me and my style of coding.</p>
+
+<h3 id="toc_0">Setup</h3>
+
+<p>Setup for this is pretty fast, <code>go get github.com/gorilla/mux</code></p>
+
+<h3 id="toc_1">The Meat and Potatos</h3>
+
+<p>The <code>main.go</code> for this is pretty simple, but if you haven&rsquo;t used <a href="http://golang.org/pkg/net/http/">net/http</a> from the Golang standard library you might be scratching your head trying to figure out what&rsquo;s going on.</p>
+
+<h5 id="toc_2">Example main.go</h5>
+
+<pre><code>package main
+
+import (
+    &quot;fmt&quot;
+    &quot;github.com/gorilla/mux&quot;
+    &quot;net/http&quot;
+)
+
+func ArticleHandler(w http.ResponseWriter, r *http.Request) {
+    fmt.Println(&quot;Article URI&quot;)
+}
+
+func main() {
+    // Create a new Router instance
+    router := mux.NewRouter()
+
+    // Add the URI /article to be handled by the ArticleHandler method
+    router.HandleFunc(&quot;/article&quot;, ArticleHandler)
+
+    // Add the URI / to be handled by a closure
+    router.HandleFunc(&quot;/&quot;, func(w http.ResponseWriter, r *http.Request) {
+        fmt.Println(&quot;Root URI&quot;)
+    })
+
+    // Pass our router to net/http
+    http.Handle(&quot;/&quot;, router)
+
+    // Listen and serve on localhost:8080
+    http.ListenAndServe(&quot;:8080&quot;, nil)
+}
+</code></pre>
+
+<p>Alright, that&rsquo;s cool so what do we do with it?</p>
+
+<p>Well, sounds like a great way build a back end service and a separate front end application using something like AngularJS.</p>
+
+<p>Next article I will go into more detail.  Until then, you can check out the code for this series here: <a href="https://github.com/taion809/go-helloblog">HelloBlog</a></p>
+
+<p>As always, if there are errors or you have a suggestion send me a message.</p>
+
+    </div>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'redstalker';
+    var disqus_identifier = 'http:\/\/redstalker.com\/blog\/2014\/04\/19\/getting-started-gorilla-mux';
+    var disqus_title = 'Getting Started with Gorilla MUX';
+    var disqus_url = 'http:\/\/redstalker.com\/blog\/2014\/04\/19\/getting-started-gorilla-mux';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+</div>
+
+<footer class="text-center">
+    <div class="footer-below">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    Copyright &copy; 2014 - Redstalker.com | <a href="/credits">Credits</a> - <a href="https://twitter.com/taion809">Twitter</a> - <a href="https://github.com/taion809">Github</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</body>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+</html>

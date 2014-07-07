@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+      <title>Recent Content on Redstalker </title>
+      <generator uri="https://hugo.spf13.com">Hugo</generator>
+    <link>http://redstalker.com/index.xml</link>
+    <language>en-us</language>
+    <author>Nicholas Johns</author>
+    <copyright>Copyright (c) 2013 - 2014, Redstalker.com; All Rights Reserved.</copyright>
+    <updated>Sat, 19 Apr 2014 16:05:12 UTC</updated>
+    
+    <item>
+      <title>Getting Started with Gorilla MUX</title>
+      <link>http://redstalker.com/blog/2014/04/19/getting-started-gorilla-mux</link>
+      <pubDate>Sat, 19 Apr 2014 16:05:12 UTC</pubDate>
+      <author>Nicholas Johns</author>
+      <guid>http://redstalker.com/blog/2014/04/19/getting-started-gorilla-mux</guid>
+      <description>
+
+&lt;p&gt;This is going to be short and sweet.  I have been looking at getting into Go for awhile but lacked incentive.  That has, as of a week ago, changed and it&amp;rsquo;s full speed ahead.&lt;/p&gt;
+
+&lt;p&gt;For this I will be using &lt;a href=&#34;http://www.gorillatoolkit.org/pkg/mux&#34;&gt;Gorilla MUX&lt;/a&gt;.  If you haven&amp;rsquo;t taken a look at the Gorilla toolkit yet I highly recommend it.  I really enjoy using it, the use as individual components really resonates with me and my style of coding.&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_0&#34;&gt;Setup&lt;/h3&gt;
+
+&lt;p&gt;Setup for this is pretty fast, &lt;code&gt;go get github.com/gorilla/mux&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_1&#34;&gt;The Meat and Potatos&lt;/h3&gt;
+
+&lt;p&gt;The &lt;code&gt;main.go&lt;/code&gt; for this is pretty simple, but if you haven&amp;rsquo;t used &lt;a href=&#34;http://golang.org/pkg/net/http/&#34;&gt;net/http&lt;/a&gt; from the Golang standard library you might be scratching your head trying to figure out what&amp;rsquo;s going on.&lt;/p&gt;
+
+&lt;h5 id=&#34;toc_2&#34;&gt;Example main.go&lt;/h5&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import (
+    &amp;quot;fmt&amp;quot;
+    &amp;quot;github.com/gorilla/mux&amp;quot;
+    &amp;quot;net/http&amp;quot;
+)
+
+func ArticleHandler(w http.ResponseWriter, r *http.Request) {
+    fmt.Println(&amp;quot;Article URI&amp;quot;)
+}
+
+func main() {
+    // Create a new Router instance
+    router := mux.NewRouter()
+
+    // Add the URI /article to be handled by the ArticleHandler method
+    router.HandleFunc(&amp;quot;/article&amp;quot;, ArticleHandler)
+
+    // Add the URI / to be handled by a closure
+    router.HandleFunc(&amp;quot;/&amp;quot;, func(w http.ResponseWriter, r *http.Request) {
+        fmt.Println(&amp;quot;Root URI&amp;quot;)
+    })
+
+    // Pass our router to net/http
+    http.Handle(&amp;quot;/&amp;quot;, router)
+
+    // Listen and serve on localhost:8080
+    http.ListenAndServe(&amp;quot;:8080&amp;quot;, nil)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Alright, that&amp;rsquo;s cool so what do we do with it?&lt;/p&gt;
+
+&lt;p&gt;Well, sounds like a great way build a back end service and a separate front end application using something like AngularJS.&lt;/p&gt;
+
+&lt;p&gt;Next article I will go into more detail.  Until then, you can check out the code for this series here: &lt;a href=&#34;https://github.com/taion809/go-helloblog&#34;&gt;HelloBlog&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;As always, if there are errors or you have a suggestion send me a message.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Docker: Containing Madness</title>
+      <link>http://redstalker.com/blog/2013/11/09/docker-containing-madness</link>
+      <pubDate>Sat, 09 Nov 2013 01:31:43 UTC</pubDate>
+      <author>Nicholas Johns</author>
+      <guid>http://redstalker.com/blog/2013/11/09/docker-containing-madness</guid>
+      <description>
+
+&lt;p&gt;Recently we had one of our important clients come to us with a node.js application they needed updated.  I&amp;rsquo;m not sure of the circumstances surrounding this application but it looked and felt like a ball of spaghetti was thrown in my face.  I punted the modifications to another developer in favor of doing the deployment with docker and supervisord.&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_0&#34;&gt;The Problem&lt;/h3&gt;
+
+&lt;p&gt;This node.js application has many assumptions about libraries and file locations that make me cringe, for example it simply won&amp;rsquo;t work unless packages are installed globally &lt;strong&gt;and&lt;/strong&gt; locally.&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_1&#34;&gt;The Solution&lt;/h3&gt;
+
+&lt;p&gt;Build a docker image containing the application so that it could be deployed without touching anything outside of its container, think like a chroot.&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_2&#34;&gt;Let&amp;rsquo;s Do It!&lt;/h3&gt;
+
+&lt;p&gt;The application we will be using can be found in my &lt;a href=&#34;https://github.com/taion809/hello-node&#34;&gt;github repository&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The following Dockerfile will be used to build our image.  We are using Dockerfiles because it  makes building images simple, versioned, and easily distributable.&lt;/p&gt;
+
+&lt;p&gt;Our Dockerfile
+{% gist 7380804 Dockerfile %}&lt;/p&gt;
+
+&lt;p&gt;In order to build our image from this Dockerfile we will execute the following command.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo docker build -t=&#39;johnsn/webapp&#39; . 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You should see output like the following&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# Excerpt
+Step 14 : ENTRYPOINT [&amp;quot;/usr/bin/nodejs&amp;quot;]
+ ---&amp;gt; Running in 0db9a210f33c
+ ---&amp;gt; a82cdefae38d
+Step 15 : CMD [&amp;quot;server.js&amp;quot;]
+ ---&amp;gt; Running in c11ec2908881
+ ---&amp;gt; 439913416e8f
+Successfully built 439913416e8f
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You can now make the choice to push your image to the docker.io registry, a private registry, or not push at all.  If you chose to push it to a registry you will need to use the docker push command.&lt;/p&gt;
+
+&lt;p&gt;From here use docker run to create and start a container so we can verify the build worked.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo docker run -d -p 5000:80 johnsn/webapp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You should receive output like the following, we used the -p flag to map our host port 5000 to the container port 80 which we exposed in the Dockerfile&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# Your container ID will be returned
+3f1a9b9ac4e4
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Verify with curl&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;curl -v localhost:5000
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;At this point we have a web application running inside a docker container we can serve on port 5000.  But, we have a problem, after a reboot we need to manually run the docker run command to bring up our web app again.  Let&amp;rsquo;s solve that problem with supervisord.&lt;/p&gt;
+
+&lt;p&gt;Supervisord is really simple and convenient which is why I am using it over something like daemontools.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[program:webapp]
+command=/usr/bin/docker run -p 5000:80 johnsn/webapp
+autostart=true
+autorestart=true
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Notice we do not use the -d flag, this is because Supervisord will run our container as a daemon.&lt;/p&gt;
+
+&lt;p&gt;Now restart the supervisord service with &lt;code&gt;service&lt;/code&gt; or using &lt;code&gt;supervisorctl&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# sudo service supervisor restart does not work :\
+
+sudo service supervisor stop
+sudo service supervisor start
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Verify&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ps aux | grep webapp
+
+# root      8964  0.0  0.7 186948  3600 ?        Sl   03:54   0:00 /usr/bin/docker run -p 5000:80 johnsn/webapp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;!-- Logging options here... sometime. --&gt;
+
+&lt;p&gt;Alright, so let&amp;rsquo;s setup nginx properly so we can have webapp.com instead of webapp.com:5000&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;## HTTP server.
+server {
+    listen 80; # IPv4
+
+    server_name webapp.com;
+
+    ## Access and error logs.
+    access_log /var/log/nginx/webapp.com_access.log;
+    error_log /var/log/nginx/webapp.com_error.log;
+
+    location / {
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Server $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://127.0.0.1:5000;
+    }
+
+} # HTTP server
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Restart the nginx and verify!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;curl -v webapp.com
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That is it, 30 minutes later we have an immutable linux container for our web app that we can then deploy to a single server or many servers.&lt;/p&gt;
+
+&lt;p&gt;Please let me know if you see errors, have corrections, or know a better way.&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_3&#34;&gt;References&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://docker.io&#34;&gt;Docker&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://supervisord.org/&#34;&gt;Supervisord&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Splitting Mysql Dumps</title>
+      <link>http://redstalker.com/blog/2013/09/21/splitting-mysql-dumps</link>
+      <pubDate>Sat, 21 Sep 2013 10:27:15 UTC</pubDate>
+      <author>Nicholas Johns</author>
+      <guid>http://redstalker.com/blog/2013/09/21/splitting-mysql-dumps</guid>
+      <description>
+
+&lt;p&gt;The version of phpMyAdmin on Rackspace Cloud Sites has a hard limit of 16Mb for imported SQL. I recently had to migrate a database that was over 500Mb.&lt;/p&gt;
+
+&lt;p&gt;The solution was simple but tedious, export the database schema first and import it in phpMyAdmin then separate the data into many separate files below 16Mb.&lt;/p&gt;
+
+&lt;p&gt;I came up with a lot of ridiculous solutions using python, perl, combinations of science and voodoo until I realized the solution already existed, Linux. Utilizing the split and sed we can split the database dump into many small parts.&lt;/p&gt;
+
+&lt;h4 id=&#34;toc_0&#34;&gt;Split&lt;/h4&gt;
+
+&lt;p&gt;In order to split the file effectively it will take a little experimentation (this is really fast though so it shouldn&amp;rsquo;t take long to figure out).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;split -l 40000 big_giant_db.dump
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Will split a file into individual files with 40,000 lines each. Splitting this way will yield files of varying sizes and depending on the data you may still have files over 16Mb which will need to be dealt with in the same way (kind of like recursion, no?).&lt;/p&gt;
+
+&lt;h4 id=&#34;toc_1&#34;&gt;Processing&lt;/h4&gt;
+
+&lt;p&gt;I needed to disable foreign key constraints and wrap each file in a transaction but editing 90 individual files is a pain in the butt, so let&amp;rsquo;s skip that and do it with sed!&lt;/p&gt;
+
+&lt;p&gt;The following command will build a list of files starting with &amp;lsquo;x&amp;rsquo;, which is the output from split, and run sed against them to place text in the beginning of the file.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;find ./x* -type f -print0 | while IFS= read -r -d &#39;&#39; filename;\
+do sed -i &#39;1s/^/\n\nSET FOREIGN_KEY_CHECKS=0;\nSET SQL_MODE = \&amp;quot;NO_AUTO_VALUE_ON_ZERO\&amp;quot;;\nSET AUTOCOMMIT = 0;\nSET time_zone = \&amp;quot;+00:00\&amp;quot;;\nSTART TRANSACTION;\n\n /&#39; $filename;\
+done
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Holy crap! You thought you had escaped your sed and perl nightmares, didn&amp;rsquo;t you?&lt;/p&gt;
+
+&lt;p&gt;The output will look something like this&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;SET FOREIGN_KEY_CHECKS=0;
+SET SQL_MODE = &amp;quot;NO_AUTO_VALUE_ON_ZERO&amp;quot;;
+SET AUTOCOMMIT = 0;
+SET time_zone = &amp;quot;+00:00&amp;quot;;
+START TRANSACTION;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To finish up we need to add the sql commit and re enable foreign key checks, so let&amp;rsquo;s get to it.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;find ./x* -type f -print0 | while IFS= read -r -d &#39;&#39; filename;\
+do sed -i &#39;$s/$/\n\nCOMMIT;\nSET FOREIGN_KEY_CHECKS=1;\n\n /&#39; $filename;\
+done
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Like the command before, this will append text to the bottom of each file generated by the find command.&lt;/p&gt;
+
+&lt;p&gt;The output will look something like this&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;COMMIT;
+SET FOREIGN_KEY_CHECKS=1;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I hope this helped someone else, I apologize for formatting. If you know a better way to do this send me an email, twitter, comment, pull request, or smoke signal.&lt;/p&gt;
+
+&lt;h4 id=&#34;toc_2&#34;&gt;Update&lt;/h4&gt;
+
+&lt;p&gt;So, had I read the damn Rackspace Cloud Sites KB in the first place I would have known that it is possible to import a database through a shell script&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+mysql -h host-u user -p&#39;password&#39; db_name &amp;lt; /path/to/backup.sql
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;toc_3&#34;&gt;References&lt;/h4&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;a href=&#34;https://gist.github.com/taion809/6603818&#34;&gt;My gist&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://stackoverflow.com/questions/132902/how-do-i-split-the-output-from-mysqldump-into-smaller-files&#34;&gt;Stackoverflow&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Jenkins CI Deployment with Bitbucket</title>
+      <link>http://redstalker.com/blog/2013/08/20/jenkins-ci-deployment-with-bitbucket</link>
+      <pubDate>Tue, 20 Aug 2013 13:23:00 UTC</pubDate>
+      <author>Nicholas Johns</author>
+      <guid>http://redstalker.com/blog/2013/08/20/jenkins-ci-deployment-with-bitbucket</guid>
+      <description>
+
+&lt;p&gt;I recently had someone ask me how to get started with Jenkins-CI, git, and ssh. My team is using it now for a CI-git deployment scheme but I was not the one to install or configure it. I didn&amp;rsquo;t really want to let down my friend with an &amp;ldquo;I don&amp;rsquo;t know, google it&amp;rdquo; answer so I spun up a new EC2 instance on Amazon AWS, installed Jenkins, pushed a new private repo to bitbucket, pulled and deployed that push on my Jenkins test server.&lt;/p&gt;
+
+&lt;p&gt;Setting up a t1.micro EC2 instance in Amazon AWS is simple enough so we can skip that.&lt;/p&gt;
+
+&lt;p&gt;Steps for installing Jenkins-CI can be found on its homepage so we can safely skip that as well. (Note: for this test I was not using jenkins behind a webserver proxy)&lt;/p&gt;
+
+&lt;p&gt;For the following steps I executed them as the jenkins user, you may do it another way if you wish, this is simply how I did it.&lt;/p&gt;
+
+&lt;h4 id=&#34;toc_0&#34;&gt;Create SSH Keypair&lt;/h4&gt;
+
+&lt;p&gt;Creating an SSH keypair for use with jenkins and bitbucket:
+From the server:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ssh-keygen -b 2048 -t rsa -c &amp;quot;Jenkins Deployment Keys&amp;quot; -f /output/path/privatekey
+chmod 0600 /output/path/privatekey
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note: for my test I built the keys and configured git as the jenkins user&lt;/p&gt;
+
+&lt;p&gt;These sets of keys should be created with an empty password, for which you can simply press enter on the prompt.
+Configure SSH&lt;/p&gt;
+
+&lt;h4 id=&#34;toc_1&#34;&gt;Create a config to map the host and identity files&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;vim /var/lib/jenkins/.ssh/config
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;My config file looks like this&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Host jenkins-test-bitbucket
+    HostName bitbucket.org
+    User git
+    IdentityFile /var/lib/jenkins/.ssh/privatekey
+    IdentitiesOnly yes
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;toc_2&#34;&gt;Add SSH public key to bitbucket&lt;/h4&gt;
+
+&lt;p&gt;At this point you have created your public and private keypair and created a config file to map the identity file to a host. Now, the public key needs to be added to your bitbucket account, the steps to accomplish this (should it change in the future) can be found on the bitbucket.org website but at the time of this writing you can&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Login to bitbucket.org&lt;/li&gt;
+&lt;li&gt;Navigate to your repository&lt;/li&gt;
+&lt;li&gt;Select the Gear icon&lt;/li&gt;
+&lt;li&gt;Select Deployment Keys&lt;/li&gt;
+&lt;li&gt;Click Add Keys&lt;/li&gt;
+&lt;li&gt;Give it a witty label (or not)&lt;/li&gt;
+&lt;li&gt;Copy and paste your public key&lt;/li&gt;
+&lt;li&gt;Click Add Key&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;toc_3&#34;&gt;SSH Test Connection&lt;/h4&gt;
+
+&lt;p&gt;Now, back to your server, you will need to approve the host. The easiest way is to simply try to connect.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ssh jenkins-test-bitbucket
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;When prompted to continue the connection and add the host to your known hosts file type yes&lt;/p&gt;
+
+&lt;p&gt;If everything has gone smooth so far you should see the following output&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;jenkins@localhost:/var/lib/jenkins$ ssh jenkins-test-bitbucket
+PTY allocation request failed on channel 0
+conq: logged in as myusername.
+
+You can use git or hg to connect to Bitbucket. Shell access is disabled.
+Connection to bitbucket.org closed.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now that you have verified you can connect to bitbucket via ssh you need to install git, the jenkins git plugin, and configure the global settings for git.&lt;/p&gt;
+
+&lt;h4 id=&#34;toc_4&#34;&gt;Configure Git&lt;/h4&gt;
+
+&lt;p&gt;Git: on debian / ubuntu you can simply&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apt-get install git
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Git Plugin: the Jenkins-CI website maintains this file, download it and place it in the JENKINS_HOME/plugins directory (mine is located /var/lib/jenkins/plugins)&lt;/p&gt;
+
+&lt;p&gt;Configure git: you need to set the username and email address for your user
+Example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;git config --global user.email &amp;quot;jenkins@localhost&amp;quot;
+git config --global user.name &amp;quot;jenkins&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Obviously replace those values with what you like.&lt;/p&gt;
+
+&lt;h4 id=&#34;toc_5&#34;&gt;Configure the Jenkins Job&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Login to your Jenkins website&lt;/li&gt;
+&lt;li&gt;Create a new job&lt;/li&gt;
+&lt;li&gt;Configure the job&lt;/li&gt;
+&lt;li&gt;Select Git for your SCM option&lt;/li&gt;
+&lt;li&gt;The git repo address will be in a format such as this jenkins-test-bitbucket:username/path/to/repo.git&lt;/li&gt;
+&lt;li&gt;Continue configuring (for example, if you have a shell script or ant script to run after you pull the repo that runs unit tests)&lt;/li&gt;
+&lt;li&gt;Save&lt;/li&gt;
+&lt;li&gt;BUILD!&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If everything was successful and the planets are aligned you should see your repo pull and if you configured any scripts they should run.&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;m sure there are others that have a better, faster way to accomplish this but this is simply how I did it and hopefully this helps someone.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>http://redstalker.com/credits</link>
+      <pubDate>Tue, 01 Jan 2008 00:00:00 UTC</pubDate>
+      <author>Nicholas Johns</author>
+      <guid>http://redstalker.com/credits</guid>
+      <description>&lt;!DOCTYPE html&gt;
+&lt;html lang=&#34;en&#34;&gt;
+&lt;head&gt;
+    &lt;meta charset=&#34;utf-8&#34;&gt;
+    &lt;meta name=&#34;viewport&#34; content=&#34;width=device-width, initial-scale=1.0&#34;&gt;
+    &lt;meta name=&#34;description&#34; content=&#34;Redstalker is a web development consulting agency specializing in social media and marketing&#34;&gt;
+    &lt;meta name=&#34;author&#34; content=&#34;Nicholas Johns&#34;&gt;
+
+    &lt;title&gt;{{ .Site.Title }}&lt;/title&gt;
+
+    &lt;!-- Custom Google Web Font --&gt;
+    &lt;link href=&#39;http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic&#39; rel=&#39;stylesheet&#39; type=&#39;text/css&#39;&gt;
+    &lt;link href=&#34;/css/rswatch.min.css&#34; rel=&#34;stylesheet&#34;&gt;
+    &lt;link href=&#34;/css/font-awesome.min.css&#34; rel=&#34;stylesheet&#34;&gt;    
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;nav class=&#34;navbar navbar-default navbar-default-rs navbar-fixed-top&#34; role=&#34;navigation&#34;&gt;
+        &lt;div class=&#34;container&#34;&gt;
+            &lt;div class=&#34;navbar-header&#34;&gt;
+                &lt;button type=&#34;button&#34; class=&#34;navbar-toggle&#34; data-toggle=&#34;collapse&#34; data-target=&#34;.navbar-ex1-collapse&#34;&gt;
+                    &lt;span class=&#34;sr-only&#34;&gt;Toggle navigation&lt;/span&gt;
+                    &lt;span class=&#34;icon-bar&#34;&gt;&lt;/span&gt;
+                    &lt;span class=&#34;icon-bar&#34;&gt;&lt;/span&gt;
+                    &lt;span class=&#34;icon-bar&#34;&gt;&lt;/span&gt;
+                &lt;/button&gt;
+                &lt;a class=&#34;navbar-brand&#34; href=&#34;/&#34;&gt;Redstalker&lt;/a&gt;
+            &lt;/div&gt;
+
+            &lt;!-- Collect the nav links, forms, and other content for toggling --&gt;
+            &lt;div class=&#34;collapse navbar-collapse navbar-right navbar-ex1-collapse&#34;&gt;
+                &lt;ul class=&#34;nav navbar-nav&#34;&gt;
+                    &lt;li&gt;&lt;a href=&#34;http://redstalker.com/blog&#34;&gt;Blog&lt;/a&gt;
+                    &lt;/li&gt;
+                    &lt;li class=&#34;page-scroll&#34; &gt;&lt;a href=&#34;#contact&#34;&gt;Hire Me&lt;/a&gt;
+                    &lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/div&gt;
+            &lt;!-- /.navbar-collapse --&gt;
+        &lt;/div&gt;
+        &lt;!-- /.container --&gt;
+    &lt;/nav&gt;
+    &lt;div class=&#34;container&#34;&gt;
+        &lt;div class=&#34;row&#34;&gt;
+            &lt;div class=&#34;col-lg-12 text-center&#34;&gt;
+                &lt;h2&gt;Credits&lt;/h2&gt;
+                &lt;hr /&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&#34;row&#34;&gt;
+            &lt;div class=&#34;col-lg-8 col-lg-offset-2&#34;&gt;
+                &lt;h3&gt;A great big thank you to:&lt;/h3&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;Bootstrap&lt;/li&gt;
+                    &lt;li&gt;Start Bootstrap&lt;/li&gt;
+                    &lt;li&gt;Font Awesome&lt;/li&gt;
+                    &lt;li&gt;Bootswatch&lt;/li&gt;
+                    &lt;li&gt;&lt;a href=&#34;https://deathtothestockphoto.com&#34;&gt;Death to stock photography&lt;/a&gt;&lt;/li&gt;
+                    &lt;li&gt;&lt;a href=&#34;http://unsplash.com/&#34;&gt;Unsplash&lt;/a&gt;&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&#34;banner&#34;&gt;
+    &lt;section id=&#34;contact&#34;&gt;
+    &lt;div class=&#34;contact-banner&#34;&gt;
+        &lt;div class=&#34;container&#34;&gt;
+            &lt;div class=&#34;row&#34;&gt;
+                &lt;div class=&#34;col-lg-5 col-sm-6&#34;&gt;
+                    &lt;h2 class=&#34;section-heading&#34;&gt;Hire Me&lt;/h2&gt;
+                    &lt;p class=&#34;lead&#34;&gt;Ready to discuss your next web application?&lt;/p&gt;
+                    &lt;form role=&#34;form&#34;&gt;
+                        &lt;div class=&#34;row&#34;&gt;
+                            &lt;div class=&#34;form-group col-xs-12 floating-label-form-group&#34;&gt;
+                                &lt;label for=&#34;name&#34;&gt;Name&lt;/label&gt;
+                                &lt;input id=&#34;name&#34; type=&#34;text&#34; placeholder=&#34;What is your name?&#34; name=&#34;name&#34; class=&#34;form-control&#34;&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                        &lt;div class=&#34;row&#34;&gt;
+                            &lt;div class=&#34;form-group col-xs-12 floating-label-form-group&#34;&gt;
+                                &lt;label for=&#34;email&#34;&gt;Email Address&lt;/label&gt;
+                                &lt;input id=&#34;email&#34; type=&#34;email&#34; placeholder=&#34;Where can I contact you?&#34; name=&#34;email&#34; class=&#34;form-control&#34;&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                        &lt;div class=&#34;row&#34;&gt;
+                            &lt;div class=&#34;form-group col-xs-12 floating-label-form-group&#34;&gt;
+                                &lt;label for=&#34;message&#34;&gt;Message&lt;/label&gt;
+                                &lt;textarea id=&#34;message&#34; rows=&#34;5&#34; class=&#34;form-control&#34; placeholder=&#34;What would you like to build?&#34;&gt;&lt;/textarea&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                        &lt;br&gt;
+                        &lt;div class=&#34;row&#34;&gt;
+                            &lt;div class=&#34;form-group col-xs-12&#34;&gt;
+                                &lt;button class=&#34;btn btn-lg btn-danger&#34; type=&#34;submit&#34;&gt;Send&lt;/button&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/form&gt;
+                &lt;/div&gt;
+                &lt;div class=&#34;col-lg-5 col-lg-offset-2 col-sm-6&#34;&gt;
+                    &lt;h2 class=&#34;section-heading&#34;&gt;Subscribe&lt;/h2&gt;
+                    &lt;p class=&#34;lead&#34;&gt;Not yet ready but still want to receive periodic news and promotions?&lt;/p&gt;
+                    &lt;div id=&#34;mc_embed_signup&#34;&gt;
+                        &lt;form class=&#34;form&#34; action=&#34;http://redstalker.us8.list-manage.com/subscribe/post?u=c45dba0c40b4671c3574a6bd0&amp;amp;id=502f3fcd1d&#34; method=&#34;post&#34; id=&#34;mc-embedded-subscribe-form&#34; name=&#34;mc-embedded-subscribe-form&#34; class=&#34;validate&#34; target=&#34;_blank&#34; novalidate&gt;
+                            &lt;div class=&#34;row&#34;&gt;
+                                &lt;div class=&#34;form-group col-xs-12 floating-label-form-group&#34;&gt;
+                                    &lt;label for=&#34;mce-EMAIL&#34;&gt;Email Address&lt;/label&gt;
+                                    &lt;input type=&#34;email&#34; value=&#34;&#34; name=&#34;EMAIL&#34; class=&#34;form-control email&#34; id=&#34;mce-EMAIL&#34; placeholder=&#34;I promise I won&#39;t spam you.&#34; required&gt;
+                                    &lt;div style=&#34;position: absolute; left: -5000px;&#34;&gt;&lt;input type=&#34;text&#34; name=&#34;b_c45dba0c40b4671c3574a6bd0_502f3fcd1d&#34; tabindex=&#34;-1&#34; value=&#34;&#34;&gt;&lt;/div&gt;
+                                &lt;/div&gt;
+                            &lt;/div&gt;
+                            &lt;div class=&#34;row&#34;&gt;
+                                &lt;div class=&#34;form-group col-xs-12&#34;&gt;
+                                    &lt;input type=&#34;submit&#34; value=&#34;Subscribe&#34; name=&#34;subscribe&#34; id=&#34;mc-embedded-subscribe&#34; class=&#34;btn btn-danger&#34;&gt;
+                                &lt;/div&gt;
+                            &lt;/div&gt;
+                        &lt;/form&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;/section&gt;
+    &lt;/div&gt;
+    &lt;footer class=&#34;text-center&#34;&gt;
+        &lt;div class=&#34;footer-below&#34;&gt;
+            &lt;div class=&#34;container&#34;&gt;
+                &lt;div class=&#34;row&#34;&gt;
+                    &lt;div class=&#34;col-lg-12&#34;&gt;
+                        Copyright &amp;copy; 2014 - Redstalker.com | &lt;a href=&#34;/credits&#34;&gt;Credits&lt;/a&gt; - &lt;a href=&#34;https://twitter.com/taion809&#34;&gt;Twitter&lt;/a&gt; - &lt;a href=&#34;https://github.com/taion809&#34;&gt;Github&lt;/a&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/footer&gt;
+    &lt;!-- JavaScript --&gt;
+    &lt;script src=&#34;/js/jquery-1.10.2.js&#34;&gt;&lt;/script&gt;
+    &lt;script src=&#34;http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js&#34;&gt;&lt;/script&gt;
+    &lt;script src=&#34;/js/rs.js&#34;&gt;&lt;/script&gt;
+    &lt;script src=&#34;//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js&#34;&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
