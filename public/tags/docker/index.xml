@@ -3,7 +3,7 @@
   <channel>
       <title>Docker on Redstalker </title>
       <generator uri="https://hugo.spf13.com">Hugo</generator>
-    <link>http://redstalker.com/tags/docker/index.xml</link>
+    <link>http://redstalker.com/tags/docker/index.xml/</link>
     <language>en-us</language>
     <author>Nicholas Johns</author>
     <copyright>Copyright (c) 2013 - 2014, Redstalker.com; All Rights Reserved.</copyright>
@@ -11,10 +11,10 @@
     
     <item>
       <title>Docker: Containing Madness</title>
-      <link>http://redstalker.com/blog/2013/11/09/docker-containing-madness</link>
+      <link>http://redstalker.com/blog/2013/11/09/docker-containing-madness/</link>
       <pubDate>Sat, 09 Nov 2013 01:31:43 UTC</pubDate>
       <author>Nicholas Johns</author>
-      <guid>http://redstalker.com/blog/2013/11/09/docker-containing-madness</guid>
+      <guid>http://redstalker.com/blog/2013/11/09/docker-containing-madness/</guid>
       <description>
 
 &lt;p&gt;Recently we had one of our important clients come to us with a node.js application they needed updated.  I&amp;rsquo;m not sure of the circumstances surrounding this application but it looked and felt like a ball of spaghetti was thrown in my face.  I punted the modifications to another developer in favor of doing the deployment with docker and supervisord.&lt;/p&gt;

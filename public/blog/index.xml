@@ -3,18 +3,76 @@
   <channel>
       <title>Blogs on Redstalker </title>
       <generator uri="https://hugo.spf13.com">Hugo</generator>
-    <link>http://redstalker.com/blog/index.xml</link>
+    <link>http://redstalker.com/blog/index.xml/</link>
     <language>en-us</language>
     <author>Nicholas Johns</author>
     <copyright>Copyright (c) 2013 - 2014, Redstalker.com; All Rights Reserved.</copyright>
-    <updated>Sat, 19 Apr 2014 16:05:12 UTC</updated>
+    <updated>Thu, 27 Nov 2014 13:57:00 UTC</updated>
+    
+    <item>
+      <title>Preparing Integers With Doctrine</title>
+      <link>http://redstalker.com/blog/2014/11/27/prepare-int-select-statement/</link>
+      <pubDate>Thu, 27 Nov 2014 13:57:00 UTC</pubDate>
+      <author>Nicholas Johns</author>
+      <guid>http://redstalker.com/blog/2014/11/27/prepare-int-select-statement/</guid>
+      <description>&lt;p&gt;I recently had an issue with binding an integer to a select statement with doctrine and postgresql.&lt;/p&gt;
+
+&lt;p&gt;Given the following:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;?php
+    $sql = &#39;INSERT INTO tree (ancestor, descendant)
+            SELECT cta.ancestor, :descendant
+            FROM tree AS cta
+            WHERE cta.descendant = :ancestor
+            UNION ALL
+            SELECT :descendant, :descendant&#39;;
+
+    $statement = $connection-&amp;gt;prepare($sql);
+    $statement-&amp;gt;bindValue(&amp;quot;descendant&amp;quot;, (int) $rootNode, &#39;integer&#39;);
+    $statement-&amp;gt;bindValue(&amp;quot;ancestor&amp;quot;, (int) $ancestor, &#39;integer&#39;);
+    $statement-&amp;gt;execute();
+?&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I received the following error:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/**
+    PHP Fatal error:  Uncaught exception &#39;PDOException&#39; with message &#39;SQLSTATE[42P08]: Ambiguous parameter: 7 ERROR:  inconsistent types deduced for parameter $1
+    LINE 2:                 SELECT cta.ancestor, $1
+                                                          ^
+    DETAIL:  integer versus text&#39; in /vagrant_data/vendor/doctrine/dbal/lib/Doctrine/DBAL/Driver/PDOStatement.php:91
+*/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The solution was to explicitly cast it as an integer like so ::integer&lt;/p&gt;
+
+&lt;p&gt;And here is the revised code:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;?php
+    $sql = &#39;INSERT INTO tree (ancestor, descendant)
+            SELECT cta.ancestor, :descendant::integer
+            FROM tree AS cta
+            WHERE cta.descendant = :ancestor
+            UNION ALL
+            SELECT :descendant, :descendant&#39;;
+
+    $statement = $connection-&amp;gt;prepare($sql);
+    $statement-&amp;gt;bindValue(&amp;quot;descendant&amp;quot;, (int) $rootNode, &#39;integer&#39;);
+    $statement-&amp;gt;bindValue(&amp;quot;ancestor&amp;quot;, (int) $ancestor, &#39;integer&#39;);
+    $statement-&amp;gt;execute();
+?&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If there are errors or you have a suggestion send me a message @taio.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Getting Started with Gorilla MUX</title>
-      <link>http://redstalker.com/blog/2014/04/19/getting-started-gorilla-mux</link>
+      <link>http://redstalker.com/blog/2014/04/19/getting-started-gorilla-mux/</link>
       <pubDate>Sat, 19 Apr 2014 16:05:12 UTC</pubDate>
       <author>Nicholas Johns</author>
-      <guid>http://redstalker.com/blog/2014/04/19/getting-started-gorilla-mux</guid>
+      <guid>http://redstalker.com/blog/2014/04/19/getting-started-gorilla-mux/</guid>
       <description>
 
 &lt;p&gt;This is going to be short and sweet.  I have been looking at getting into Go for awhile but lacked incentive.  That has, as of a week ago, changed and it&amp;rsquo;s full speed ahead.&lt;/p&gt;
@@ -75,10 +133,10 @@ func main() {
     
     <item>
       <title>Docker: Containing Madness</title>
-      <link>http://redstalker.com/blog/2013/11/09/docker-containing-madness</link>
+      <link>http://redstalker.com/blog/2013/11/09/docker-containing-madness/</link>
       <pubDate>Sat, 09 Nov 2013 01:31:43 UTC</pubDate>
       <author>Nicholas Johns</author>
-      <guid>http://redstalker.com/blog/2013/11/09/docker-containing-madness</guid>
+      <guid>http://redstalker.com/blog/2013/11/09/docker-containing-madness/</guid>
       <description>
 
 &lt;p&gt;Recently we had one of our important clients come to us with a node.js application they needed updated.  I&amp;rsquo;m not sure of the circumstances surrounding this application but it looked and felt like a ball of spaghetti was thrown in my face.  I punted the modifications to another developer in favor of doing the deployment with docker and supervisord.&lt;/p&gt;
@@ -206,10 +264,10 @@ server {
     
     <item>
       <title>Splitting Mysql Dumps</title>
-      <link>http://redstalker.com/blog/2013/09/21/splitting-mysql-dumps</link>
+      <link>http://redstalker.com/blog/2013/09/21/splitting-mysql-dumps/</link>
       <pubDate>Sat, 21 Sep 2013 10:27:15 UTC</pubDate>
       <author>Nicholas Johns</author>
-      <guid>http://redstalker.com/blog/2013/09/21/splitting-mysql-dumps</guid>
+      <guid>http://redstalker.com/blog/2013/09/21/splitting-mysql-dumps/</guid>
       <description>
 
 &lt;p&gt;The version of phpMyAdmin on Rackspace Cloud Sites has a hard limit of 16Mb for imported SQL. I recently had to migrate a database that was over 500Mb.&lt;/p&gt;
@@ -285,10 +343,10 @@ mysql -h host-u user -p&#39;password&#39; db_name &amp;lt; /path/to/backup.sql
     
     <item>
       <title>Jenkins CI Deployment with Bitbucket</title>
-      <link>http://redstalker.com/blog/2013/08/20/jenkins-ci-deployment-with-bitbucket</link>
+      <link>http://redstalker.com/blog/2013/08/20/jenkins-ci-deployment-with-bitbucket/</link>
       <pubDate>Tue, 20 Aug 2013 13:23:00 UTC</pubDate>
       <author>Nicholas Johns</author>
-      <guid>http://redstalker.com/blog/2013/08/20/jenkins-ci-deployment-with-bitbucket</guid>
+      <guid>http://redstalker.com/blog/2013/08/20/jenkins-ci-deployment-with-bitbucket/</guid>
       <description>
 
 &lt;p&gt;I recently had someone ask me how to get started with Jenkins-CI, git, and ssh. My team is using it now for a CI-git deployment scheme but I was not the one to install or configure it. I didn&amp;rsquo;t really want to let down my friend with an &amp;ldquo;I don&amp;rsquo;t know, google it&amp;rdquo; answer so I spun up a new EC2 instance on Amazon AWS, installed Jenkins, pushed a new private repo to bitbucket, pulled and deployed that push on my Jenkins test server.&lt;/p&gt;
